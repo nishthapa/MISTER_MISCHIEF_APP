@@ -24,7 +24,7 @@ fun TelemetryScreen(viewModel: RemoteControlViewModel) {
     val telemetry by viewModel.telemetryState.collectAsState()
 
     // Split the categories into two equal columns
-    val leftCategories = listOf("Cognition", "Physics", "Sensors", "System Health")
+    val leftCategories = listOf("Cognition", "Physics", "Sensors", "System Health", "System Logs")
     val rightCategories = listOf("Control Debug", "Events", "Network Link", "Perception")
 
     Row(
@@ -180,8 +180,19 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
             }
             "System Health" -> {
                 DataRow("Loop Time", "${telemetry.health.loopTimeUs} µs")
-                DataRow("Free Heap", "${telemetry.health.freeHeap / 1024u} KB")
+                DataRow("Free RAM", "${telemetry.health.freeHeap / 1024u} KB")
+                DataRow("CPU 0 (Sensors)", "${telemetry.health.cpu0Load}%")
+                DataRow("CPU 1 (Physics)", "${telemetry.health.cpu1Load}%")
                 DataRow("HW Bitmask", "0x${telemetry.health.hardwareBitmask.toString(16).uppercase()}")
+            }
+            "System Logs" -> {
+                // We use a Text box instead of a DataRow so long logs can wrap to the next line naturally!
+                Text(
+                    text = "> ${telemetry.logs.latestMessage}",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

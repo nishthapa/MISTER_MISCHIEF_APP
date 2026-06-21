@@ -11,7 +11,8 @@ data class RobotTelemetry(
     val network: NetworkLink = NetworkLink(),
     val events: EventState = EventState(),
     val controlDebug: ControlDebug = ControlDebug(),
-    val perception: PerceptionMetrics = PerceptionMetrics()
+    val perception: PerceptionMetrics = PerceptionMetrics(),
+    val logs: SystemLogs = SystemLogs()
 )
 
 data class CognitiveState(
@@ -34,7 +35,14 @@ data class SensorState(
 data class SystemHealth(
     val loopTimeUs: UInt = 0u,
     val freeHeap: UInt = 0u,
-    val hardwareBitmask: UShort = 0u
+    val hardwareBitmask: UShort = 0u,
+    val cpu0Load: UByte = 0u, // Robot CPU0 Load
+    val cpu1Load: UByte = 0u  // Robot CPU1 Load
+)
+
+// NEW: Container for the text logs // Serial.println() mirrors
+data class SystemLogs(
+    val latestMessage: String = "Serial.println() will be mirrored here"
 )
 
 data class NetworkLink(

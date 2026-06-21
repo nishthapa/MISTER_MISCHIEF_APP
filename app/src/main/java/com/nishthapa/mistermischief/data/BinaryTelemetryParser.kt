@@ -60,7 +60,7 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
 
                 if (calcChecksum.toByte() == checksum) {
                     // Update our local memory footprint
-                    parsePayload(msgId, ByteBuffer.wrap(payload).order(ByteOrder.LITTLE_ENDIAN))
+                    parsePayload(msgId, ByteBuffer.wrap(payload).order(ByteOrder.LITTLE_ENDIAN), payloadLen)
                     stateChanged = true
                 }
 
@@ -81,7 +81,7 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
         }
     }
 
-    private fun parsePayload(msgId: Int, bb: ByteBuffer) {
+    private fun parsePayload(msgId: Int, bb: ByteBuffer, payloadLen: Int) {
         try {
             when (msgId) {
                 131 -> { // Cognitive State (<BB)
@@ -104,10 +104,19 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                         distanceCM = bb.float, batteryVoltageMV = bb.short.toUShort(), currentDrawMA = bb.short
                     ))
                 }
-                130 -> { // System Health (<IIH)
+                130 -> { // System Health (<IIHBB)
                     localSnapshot = localSnapshot.copy(health = SystemHealth(
-                        loopTimeUs = bb.int.toUInt(), freeHeap = bb.int.toUInt(), hardwareBitmask = bb.short.toUShort()
+                        loopTimeUs = bb.int.toUInt(), freeHeap = bb.int.toUInt(),
+                        hardwareBitmask = bb.short.toUShort(),
+                        cpu0Load = bb.get().toUByte(), cpu1Load = bb.get().toUByte()
                     ))
+                }
+                140 -> { // System Logs (String)
+                    val textBytes = ByteArray(payloadLen)
+                    bb.get(textBytes)
+                    // Convert raw bytes to text and strip any trailing null terminators
+                    val text = String(textBytes, Charsets.UTF_8).trimEnd('\u0000')
+                    localSnapshot = localSnapshot.copy(logs = SystemLogs(latestMessage = text))
                 }
                 132 -> { // Network Link (<bb)
                     localSnapshot = localSnapshot.copy(network = NetworkLink(
