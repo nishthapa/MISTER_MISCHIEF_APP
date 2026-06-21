@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface RobotConnection {
     val connectionState: StateFlow<ConnectionStatus>
+    val telemetryState: StateFlow<com.nishthapa.mistermischief.domain.RobotTelemetry> // <--- NEW
     fun connect(deviceAddress: String)
     fun disconnect()
     fun sendCommand(command: TeleopCommand)

@@ -2,11 +2,15 @@ package com.nishthapa.mistermischief.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope // <--- The missing import!
 import com.nishthapa.mistermischief.core.RobotConnection
 import com.nishthapa.mistermischief.domain.TeleopCommand
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class RemoteControlViewModel(private val connection: RobotConnection) : ViewModel() {
 
@@ -24,13 +28,15 @@ class RemoteControlViewModel(private val connection: RobotConnection) : ViewMode
     // --- NEW: DRIVING TOKEN STATE ---
     private val _isDrivingEnabled = MutableStateFlow(false)
     val isDrivingEnabled = _isDrivingEnabled.asStateFlow()
+    // Expose live telemetry to the UI
+    val telemetryState = connection.telemetryState
+
+    // --- NEW: THE CONTINUOUS HEARTBEAT LOOP ---
+    private var heartbeatJob: Job? = null
 
     fun updateMacAddress(newMac: String) {
         _macAddress.value = newMac
     }
-
-    // --- NEW: BLE THROTTLE STATE ---
-    private var lastSendTime = 0L
 
     // Pass-through connection methods
     fun connectToRobot() {
@@ -41,40 +47,41 @@ class RemoteControlViewModel(private val connection: RobotConnection) : ViewMode
         // Safety: Explicitly release the token BEFORE dropping the Bluetooth link!
         toggleDriving(false)
         connection.disconnect()
-        // Safety: zero out the joysticks on disconnect
-        updateJoystick(0f, 0f)
     }
 
-    // NEW: Token Request Handler
+    // NEW: Token Request & Heartbeat Handler
     fun toggleDriving(enabled: Boolean) {
         _isDrivingEnabled.value = enabled
         connection.sendControlToken(enabled)
 
-        // If we revoke the token, instantly zero out the joystick values on the UI
-        if (!enabled) {
+        if (enabled) {
+            // START THE HEARTBEAT: Feed the robot's deadman switch 10 times a second!
+            heartbeatJob?.cancel()
+            heartbeatJob = viewModelScope.launch {
+                while (true) {
+                    connection.sendCommand(_currentCommand.value)
+                    delay(100) // 100ms delay = 10Hz continuous transmission
+                }
+            }
+        } else {
+            // KILL THE HEARTBEAT & ZERO MOTORS
+            heartbeatJob?.cancel()
             updateJoystick(0f, 0f)
+            // Blast one final zeroed command to guarantee the robot stops
+            connection.sendCommand(_currentCommand.value)
         }
     }
 
     // The UI calls this rapidly as your thumb moves
     fun updateJoystick(x: Float, y: Float) {
+        // Simply update the local state!
+        // The continuous heartbeat loop running in the background will automatically
+        // pick up these new values and beam them to the robot every 100ms.
         _currentCommand.update { it.copy(joyX = x, joyY = y) }
-
-        // --- NEW: SMART THROTTLING LOGIC ---
-        val currentTime = System.currentTimeMillis()
-        val isStopCommand = (x == 0f && y == 0f)
-
-        // Only send the BLE packet if 50ms has passed (20Hz limit)
-        // OR if it is a critical STOP command (bypasses the timer)
-        if (isStopCommand || currentTime - lastSendTime > 50) {
-            connection.sendCommand(_currentCommand.value)
-            lastSendTime = currentTime
-        }
     }
 
     fun togglePidDrive(enabled: Boolean) {
         _currentCommand.update { it.copy(usePIDDrive = enabled) }
-        connection.sendCommand(_currentCommand.value)
     }
 }
 

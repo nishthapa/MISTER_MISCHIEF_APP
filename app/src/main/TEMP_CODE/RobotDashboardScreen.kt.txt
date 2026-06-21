@@ -38,7 +38,7 @@ fun RobotDashboard(viewModel: RemoteControlViewModel) {
                     HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    val screens = listOf("Manual Control", "Robot Configuration", "Sensor Diagnostics", "Autonomous Behaviours")
+                    val screens = listOf("Manual Control", "Telemetry Dashboard", "Robot Configuration", "Sensor Diagnostics", "Autonomous Behaviours")
 
                     screens.forEach { screenName ->
                         NavigationDrawerItem(
@@ -80,6 +80,7 @@ fun RobotDashboard(viewModel: RemoteControlViewModel) {
                 Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
                     when (currentScreen) {
                         "Manual Control" -> ManualControlScreen(viewModel)
+                        "Telemetry Dashboard" -> TelemetryScreen(viewModel) // <--- ADD THIS
                         else -> PlaceholderScreen(currentScreen)
                     }
                 }
