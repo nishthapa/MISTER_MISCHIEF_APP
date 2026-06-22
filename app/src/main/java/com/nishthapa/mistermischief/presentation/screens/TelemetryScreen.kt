@@ -25,7 +25,7 @@ fun TelemetryScreen(viewModel: RemoteControlViewModel) {
 
     // Split the categories into two equal columns
     val leftCategories = listOf("Cognition", "Physics", "Sensors", "System Health", "System Logs")
-    val rightCategories = listOf("Control Debug", "Events", "Network Link", "Perception")
+    val rightCategories = listOf("Control Debug", "Actuators", "Events", "Network Link", "Perception")
 
     Row(
         modifier = Modifier
@@ -121,6 +121,10 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
                 DataRow("System Mode", telemetry.cognition.systemMode)
                 DataRow("Robot Mood", telemetry.cognition.robotMood)
             }
+            "Actuators" -> {
+                DataRow("Left Motor PWM", telemetry.actuators.leftMotorPWM.toString())
+                DataRow("Right Motor PWM", telemetry.actuators.rightMotorPWM.toString())
+            }
             "Control Debug" -> {
                 DataRow("Target Heading", "${"%.2f".format(telemetry.controlDebug.targetHeading)}°")
                 DataRow("Heading Error", "${"%.2f".format(telemetry.controlDebug.headingError)}°")
@@ -171,7 +175,7 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
                 DataRow("G-Force", "${"%.2f".format(telemetry.physics.gForce)} G")
                 DataRow("Has Compass", telemetry.physics.hasCompass.toString().uppercase())
                 DataRow("Compass Heading", "${"%.1f".format(telemetry.physics.compassHeading)}°")
-                DataRow("Motor PWM (L/R)", "${telemetry.physics.leftMotorPWM} / ${telemetry.physics.rightMotorPWM}")
+                //DataRow("Motor PWM (L/R)", "${telemetry.physics.leftMotorPWM} / ${telemetry.physics.rightMotorPWM}")
             }
             "Sensors" -> {
                 DataRow("Sonar Distance", if (telemetry.sensors.distanceCM < 0) "OOR" else "${"%.1f".format(telemetry.sensors.distanceCM)} cm")

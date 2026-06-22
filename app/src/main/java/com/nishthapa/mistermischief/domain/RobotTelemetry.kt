@@ -4,6 +4,7 @@ package com.nishthapa.mistermischief.domain
 data class RobotTelemetry(
     val cognition: CognitiveState = CognitiveState(),
     val physics: PhysicsState = PhysicsState(),
+    val actuators: ActuatorState = ActuatorState(),
     val sensors: SensorState = SensorState(),
     val health: SystemHealth = SystemHealth(),
 
@@ -22,8 +23,13 @@ data class CognitiveState(
 
 data class PhysicsState(
     val yaw: Float = 0f, val pitch: Float = 0f, val roll: Float = 0f,
-    val gForce: Float = 0f, val hasCompass: Boolean = false, val compassHeading: Float = 0f, // <-- ADDED hasCompass
-    val leftMotorPWM: Short = 0, val rightMotorPWM: Short = 0
+    val gForce: Float = 0f, val hasCompass: Boolean = false, val compassHeading: Float = 0f // <-- ADDED hasCompass
+    //val leftMotorPWM: Short = 0, val rightMotorPWM: Short = 0
+)
+
+data class ActuatorState(
+    val leftMotorPWM: UInt = 0u,
+    val rightMotorPWM: UInt = 0u,
 )
 
 data class SensorState(
