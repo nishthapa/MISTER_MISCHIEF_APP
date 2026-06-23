@@ -99,9 +99,9 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                         //leftMotorPWM = bb.short, rightMotorPWM = bb.short
                     ))
                 }
-                104 -> {
+                104 -> { // Actuators state (II)
                     localSnapshot = localSnapshot.copy(actuators = ActuatorState(
-                        leftMotorPWM = bb.int.toUInt(), rightMotorPWM = bb.int.toUInt()
+                        leftMotorPWM = bb.short, rightMotorPWM = bb.short
                     ))
                 }
                 110 -> { // Sensor State (<fHh)

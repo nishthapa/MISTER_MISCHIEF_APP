@@ -28,8 +28,8 @@ data class PhysicsState(
 )
 
 data class ActuatorState(
-    val leftMotorPWM: UInt = 0u,
-    val rightMotorPWM: UInt = 0u,
+    val leftMotorPWM: Short = 0,
+    val rightMotorPWM: Short = 0,
 )
 
 data class SensorState(

@@ -187,7 +187,35 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
                 DataRow("Free RAM", "${telemetry.health.freeHeap / 1024u} KB")
                 DataRow("CPU 0 (Sensors)", "${telemetry.health.cpu0Load}%")
                 DataRow("CPU 1 (Physics)", "${telemetry.health.cpu1Load}%")
-                DataRow("HW Bitmask", "0x${telemetry.health.hardwareBitmask.toString(16).uppercase()}")
+                //DataRow("HW Bitmask", "0x${telemetry.health.hardwareBitmask.toString(16).uppercase()}")
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Hardware Diagnostics", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                Divider(modifier = Modifier.padding(vertical = 4.dp))
+
+                // Helper to extract a specific bit from the 16-bit mask
+                val mask = telemetry.health.hardwareBitmask.toInt()
+                val checkBit = { bitPos: Int -> (mask and (1 shl bitPos)) != 0 }
+
+                // Map bits 0-12 (Hardware/Sensors OK vs FAIL)
+                StatusRow("FreeRTOS OS", checkBit(0), "ALIVE", "HALTED")
+                StatusRow("I2C Bus", checkBit(1))
+                StatusRow("SPI Bus", checkBit(2))
+                StatusRow("IMU (MPU)", checkBit(3))
+                StatusRow("Magnetometer", checkBit(4))
+                StatusRow("Barometer", checkBit(5))
+                StatusRow("Sonar (HC-SR04)", checkBit(6))
+                StatusRow("GPS", checkBit(7))
+                StatusRow("Cliff IR", checkBit(8))
+                StatusRow("LIDAR", checkBit(9))
+                StatusRow("Motor Driver", checkBit(10))
+                StatusRow("Power Monitor", checkBit(11))
+                StatusRow("Anti-flip Servo", checkBit(12))
+
+                // Map bits 13-15 (Network Connected vs Disconnected)
+                StatusRow("Wi-Fi Router", checkBit(13), "Connected", "Disconnected")
+                StatusRow("BLE App", checkBit(14), "Connected", "Disconnected")
+                StatusRow("USB Cable", checkBit(15), "Connected", "Disconnected")
+
             }
             "System Logs" -> {
                 // We use a Text box instead of a DataRow so long logs can wrap to the next line naturally!
@@ -207,5 +235,23 @@ fun DataRow(label: String, value: String) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(label, fontWeight = FontWeight.SemiBold, color = Color.Gray)
         Text(value, fontWeight = FontWeight.Bold)
+    }
+}
+
+// NEW: A specialized row that colors the status text Green (OK) or Red (FAIL)
+@Composable
+fun StatusRow(
+    label: String,
+    isOk: Boolean,
+    okText: String = "OK",
+    failText: String = "FAIL"
+) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, fontWeight = FontWeight.SemiBold, color = Color.Gray)
+        Text(
+            text = if (isOk) okText else failText,
+            color = if (isOk) Color(0xFF2E7D32) else Color(0xFFD32F2F), // Dark Green / Red
+            fontWeight = FontWeight.Bold
+        )
     }
 }
