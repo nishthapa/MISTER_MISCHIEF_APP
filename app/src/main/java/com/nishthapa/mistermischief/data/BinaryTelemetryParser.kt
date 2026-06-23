@@ -101,12 +101,15 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                 }
                 104 -> { // Actuators state (II)
                     localSnapshot = localSnapshot.copy(actuators = ActuatorState(
-                        leftMotorPWM = bb.short, rightMotorPWM = bb.short
+                        leftMotorPWM = bb.short, rightMotorPWM = bb.short,
+                        isDriving = bb.get().toInt() != 0
                     ))
                 }
                 110 -> { // Sensor State (<fHh)
                     localSnapshot = localSnapshot.copy(sensors = SensorState(
-                        distanceCM = bb.float, batteryVoltageMV = bb.short.toUShort(), currentDrawMA = bb.short
+                        distanceCM = bb.float, hasBaro = bb.get().toInt() != 0, pressurePa = bb.float,
+                        altitudeCM = bb.float, altitudeDeltaCM = bb.float, temperatureC = bb.float,
+                        batteryVoltageMV = bb.short.toUShort(), currentDrawMA = bb.short
                     ))
                 }
                 130 -> { // System Health (<IIHBB)

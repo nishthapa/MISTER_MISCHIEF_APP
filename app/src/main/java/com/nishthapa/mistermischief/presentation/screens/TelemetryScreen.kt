@@ -124,6 +124,7 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
             "Actuators" -> {
                 DataRow("Left Motor PWM", telemetry.actuators.leftMotorPWM.toString())
                 DataRow("Right Motor PWM", telemetry.actuators.rightMotorPWM.toString())
+                DataRow("Is Driving", telemetry.actuators.isDriving.toString().uppercase())
             }
             "Control Debug" -> {
                 DataRow("Target Heading", "${"%.2f".format(telemetry.controlDebug.targetHeading)}°")
@@ -179,6 +180,11 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
             }
             "Sensors" -> {
                 DataRow("Sonar Distance", if (telemetry.sensors.distanceCM < 0) "OOR" else "${"%.1f".format(telemetry.sensors.distanceCM)} cm")
+                DataRow("Barometer Present", telemetry.sensors.hasBaro.toString().uppercase())
+                DataRow("Pressure", "${"%.1f".format(telemetry.sensors.pressurePa)} Pa")
+                DataRow("Altitude", "${"%.1f".format(telemetry.sensors.altitudeCM)} cm")
+                DataRow("Alt. Delta", "${"%.1f".format(telemetry.sensors.altitudeDeltaCM)} cm")
+                DataRow("Temperature", "${"%.1f".format(telemetry.sensors.temperatureC)} °C")
                 DataRow("Battery Voltage", "${telemetry.sensors.batteryVoltageMV} mV")
                 DataRow("Current Draw", "${telemetry.sensors.currentDrawMA} mA")
             }

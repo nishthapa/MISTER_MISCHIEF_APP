@@ -24,16 +24,21 @@ data class CognitiveState(
 data class PhysicsState(
     val yaw: Float = 0f, val pitch: Float = 0f, val roll: Float = 0f,
     val gForce: Float = 0f, val hasCompass: Boolean = false, val compassHeading: Float = 0f // <-- ADDED hasCompass
-    //val leftMotorPWM: Short = 0, val rightMotorPWM: Short = 0
 )
 
 data class ActuatorState(
     val leftMotorPWM: Short = 0,
     val rightMotorPWM: Short = 0,
+    val isDriving: Boolean = false
 )
 
 data class SensorState(
     val distanceCM: Float = -1f,
+    val hasBaro: Boolean = false,
+    val pressurePa: Float = 0.0f,
+    val altitudeCM: Float = 0.0f,
+    val altitudeDeltaCM: Float = 0.0f,
+    val temperatureC: Float = 0.0f,
     val batteryVoltageMV: UShort = 0u,
     val currentDrawMA: Short = 0
 )
