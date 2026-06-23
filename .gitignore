@@ -6,6 +6,8 @@
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
+/app/src/main/TEMP_CODE/
+app/src/main/utils/AutoSync.ps1
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
