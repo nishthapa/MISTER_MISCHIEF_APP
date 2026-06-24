@@ -16,7 +16,7 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
     private val MODE_MAP = mapOf(
         0 to "BOOTING", 1 to "MANUAL_OVERRIDE", 2 to "NORMAL_DRIVING",
         3 to "OBSTACLE_AVOIDANCE", 4 to "MAINTAIN_DISTANCE", 5 to "COMPASS_LOCK",
-        6 to "DIZZY", 7 to "DEEP_SLEEP", 8 to "AUTOTUNE", 9 to "DIAGNOSTICS"
+        6 to "DIZZY", 7 to "DEEP_SLEEP", 8 to "AUTOTUNE", 9 to "DIAGNOSTICS", 10 to "BRAIN_DEAD"
     )
     private val MOOD_MAP = mapOf(
         0 to "HAPPY", 1 to "SAD", 2 to "ANGRY", 3 to "SCARED",
