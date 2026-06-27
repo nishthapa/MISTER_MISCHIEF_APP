@@ -131,17 +131,58 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
                 DataRow("Heading Error", "${"%.2f".format(telemetry.controlDebug.headingError)}°")
                 DataRow("PID Enabled", if (telemetry.controlDebug.pidEnabled) "ON" else "OFF")
             }
+//                Spacer(modifier = Modifier.height(8.dp)) // Visual break between bools and floats
+//
+//                DataRow("Dizzy Bar (Yaw)", "%.2f".format(telemetry.events.dizzyBarYaw))
+//                DataRow("Dizzy Bar (Pitch)", "%.2f".format(telemetry.events.dizzyBarPitch))
+//                DataRow("Dizzy Bar (Roll)", "%.2f".format(telemetry.events.dizzyBarRoll))
+//                DataRow("Smoothed Energy", "%.2f".format(telemetry.events.smoothedTotalEnergy))
+//                DataRow("Frustration Level", "%.2f".format(telemetry.events.frustrationLevel))
+//
+//                Spacer(modifier = Modifier.height(8.dp)) // Visual break between floats and bools
+//
+//                DataRow("Is Hand Teasing", telemetry.events.isHandTeasing.toString().uppercase())
+//                DataRow("Is Hand Vanishing", telemetry.events.isHandVanishing.toString().uppercase())
+//                DataRow("Is Handling", telemetry.events.isHandling.toString().uppercase())
+//                DataRow("Has Experienced Lift", telemetry.events.hasExperiencedLift.toString().uppercase())
+//                DataRow("Is Lowering", telemetry.events.isLowering.toString().uppercase())
+//                DataRow("Has Landed", telemetry.events.hasLanded.toString().uppercase())
+//                DataRow("Is Dizzy", telemetry.events.isDizzy.toString().uppercase())
+//            }
+//            "Network Link" -> {
+//                DataRow("Wi-Fi RSSI", "${telemetry.network.wifiRSSI} dBm")
+//                DataRow("BLE RSSI", "${telemetry.network.bleRSSI} dBm")
+//            }
+//            "Perception" -> {
+//                DataRow("Distance Delta", "%.3f".format(telemetry.perception.distanceDelta))
+//                DataRow("Total Raw Energy", "%.3f".format(telemetry.perception.totalRawEnergy))
+//                DataRow("Raw Yaw Energy", "%.3f".format(telemetry.perception.rawYawEnergy))
+//                DataRow("Raw Pitch Energy", "%.3f".format(telemetry.perception.rawPitchEnergy))
+//                DataRow("Raw Roll Energy", "%.3f".format(telemetry.perception.rawRollEnergy))
+//                DataRow("Current G-Force", "%.3f G".format(telemetry.perception.currentGForce))
+//            }
+
             "Events" -> {
+                DataRow("isHandling", telemetry.events.isHandling.toString().uppercase())
+                DataRow("isFreeFalling", telemetry.events.isFreeFalling.toString().uppercase())
+
+                DataRow("isUpright", telemetry.events.isUpright.toString().uppercase())
+                DataRow("isUpsideDown", telemetry.events.isUpsideDown.toString().uppercase())
+                DataRow("isTippedLeft", telemetry.events.isTippedLeft.toString().uppercase())
+                DataRow("isTippedRight", telemetry.events.isTippedRight.toString().uppercase())
+                DataRow("isNoseUp", telemetry.events.isNoseUp.toString().uppercase())
+                DataRow("isNoseDown", telemetry.events.isNoseDown.toString().uppercase())
+
+                DataRow("isAbsolutelyStill", telemetry.events.isAbsolutelyStill.toString().uppercase())
+                DataRow("isStuck", telemetry.events.isStuck.toString().uppercase())
                 DataRow("Hazard Detected", telemetry.events.hazardDetected.toString().uppercase())
-                DataRow("Tease Confirmed", telemetry.events.teaseConfirmed.toString().uppercase())
-                DataRow("Target Vanished", telemetry.events.targetVanished.toString().uppercase())
-                DataRow("Dizzy Triggered", telemetry.events.dizzyTriggered.toString().uppercase())
-                DataRow("Dizzy Finished", telemetry.events.dizzyFinished.toString().uppercase())
-                DataRow("Ready For Compass Lock", telemetry.events.readyForCompassLock.toString().uppercase())
-                DataRow("Safely Landed", telemetry.events.safelyLanded.toString().uppercase())
+
+                DataRow("isBeingTeased", telemetry.events.isBeingTeased.toString().uppercase())
+                DataRow("isBeingPushed", telemetry.events.isBeingPushed.toString().uppercase())
+                DataRow("isDizzy", telemetry.events.isDizzy.toString().uppercase())
                 DataRow("Frustration Peaked", telemetry.events.frustrationPeaked.toString().uppercase())
 
-                Spacer(modifier = Modifier.height(8.dp)) // Visual break between bools and floats
+                Spacer(modifier = Modifier.height(8.dp))
 
                 DataRow("Dizzy Bar (Yaw)", "%.2f".format(telemetry.events.dizzyBarYaw))
                 DataRow("Dizzy Bar (Pitch)", "%.2f".format(telemetry.events.dizzyBarPitch))
@@ -149,15 +190,19 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
                 DataRow("Smoothed Energy", "%.2f".format(telemetry.events.smoothedTotalEnergy))
                 DataRow("Frustration Level", "%.2f".format(telemetry.events.frustrationLevel))
 
-                Spacer(modifier = Modifier.height(8.dp)) // Visual break between floats and bools
+                Spacer(modifier = Modifier.height(8.dp))
 
+                DataRow("Tease Confirmed", telemetry.events.teaseConfirmed.toString().uppercase())
+                DataRow("Target Vanished", telemetry.events.targetVanished.toString().uppercase())
+                DataRow("Dizzy Triggered", telemetry.events.dizzyTriggered.toString().uppercase())
+                DataRow("Dizzy Finished", telemetry.events.dizzyFinished.toString().uppercase())
+                DataRow("Compass Lock Ready", telemetry.events.readyForCompassLock.toString().uppercase())
+                DataRow("Safely Landed", telemetry.events.safelyLanded.toString().uppercase())
                 DataRow("Is Hand Teasing", telemetry.events.isHandTeasing.toString().uppercase())
                 DataRow("Is Hand Vanishing", telemetry.events.isHandVanishing.toString().uppercase())
-                DataRow("Is Handling", telemetry.events.isHandling.toString().uppercase())
                 DataRow("Has Experienced Lift", telemetry.events.hasExperiencedLift.toString().uppercase())
                 DataRow("Is Lowering", telemetry.events.isLowering.toString().uppercase())
                 DataRow("Has Landed", telemetry.events.hasLanded.toString().uppercase())
-                DataRow("Is Dizzy", telemetry.events.isDizzy.toString().uppercase())
             }
             "Network Link" -> {
                 DataRow("Wi-Fi RSSI", "${telemetry.network.wifiRSSI} dBm")
@@ -171,6 +216,7 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
                 DataRow("Raw Roll Energy", "%.3f".format(telemetry.perception.rawRollEnergy))
                 DataRow("Current G-Force", "%.3f G".format(telemetry.perception.currentGForce))
             }
+
             "Physics" -> {
                 DataRow("Yaw / Pitch / Roll", "${"%.1f".format(telemetry.physics.yaw)}° / ${"%.1f".format(telemetry.physics.pitch)}° / ${"%.1f".format(telemetry.physics.roll)}°")
                 DataRow("G-Force", "${"%.2f".format(telemetry.physics.gForce)} G")

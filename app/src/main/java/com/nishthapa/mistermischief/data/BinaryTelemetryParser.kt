@@ -142,44 +142,126 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                         rawPitchEnergy = bb.float, rawRollEnergy = bb.float, currentGForce = bb.float
                     ))
                 }
-                135 -> { // Events (<8?5f7?)
+                135 -> {// Events (<8?5f7?)
                     // Extract the first 8 booleans
-                    val hazardDetected = bb.get().toInt() != 0
-                    val teaseConfirmed = bb.get().toInt() != 0
-                    val targetVanished = bb.get().toInt() != 0
-                    val dizzyTriggered = bb.get().toInt() != 0
-                    val dizzyFinished = bb.get().toInt() != 0
-                    val readyForCompassLock = bb.get().toInt() != 0
-                    val safelyLanded = bb.get().toInt() != 0
-                    val frustrationPeaked = bb.get().toInt() != 0
+                    // ==========================================================
+                    // 1. THE AI PERCEPTION LATCHES (The Physical Truth)
+                    // ==========================================================
+                    val isHandling: Boolean = bb.get().toInt() != 0
+                    val isFreeFalling: Boolean = bb.get().toInt() != 0
 
-                    // Extract the 5 floats
-                    val dizzyBarYaw = bb.float
-                    val dizzyBarPitch = bb.float
-                    val dizzyBarRoll = bb.float
-                    val smoothedTotalEnergy = bb.float
-                    val frustrationLevel = bb.float
+                    // --- The Complete Orientation Set ---
+                    val isUpright: Boolean = bb.get().toInt() != 0          // Tracks on the floor
+                    val isUpsideDown: Boolean = bb.get().toInt() != 0     // Completely flipped over (Resting on top)
+                    val isTippedLeft: Boolean = bb.get().toInt() != 0     // Resting on left side
+                    val isTippedRight: Boolean = bb.get().toInt() != 0     // Resting on right side
+                    val isNoseUp: Boolean = bb.get().toInt() != 0         // Pitch > 70 deg (Stuck pointing at ceiling)
+                    val isNoseDown: Boolean = bb.get().toInt() != 0       // Pitch < -70 deg (Faceplant / Pointing at floor)
 
-                    // Extract the final 7 booleans
-                    val isHandTeasing = bb.get().toInt() != 0
-                    val isHandVanishing = bb.get().toInt() != 0
-                    val isHandling = bb.get().toInt() != 0
-                    val hasExperiencedLift = bb.get().toInt() != 0
-                    val isLowering = bb.get().toInt() != 0
-                    val hasLanded = bb.get().toInt() != 0
-                    val isDizzy = bb.get().toInt() != 0
+                    val isAbsolutelyStill: Boolean = bb.get().toInt() != 0
+                    val isStuck: Boolean = bb.get().toInt() != 0
+                    val hazardDetected: Boolean = bb.get().toInt() != 0
+                    val isBeingTeased: Boolean = bb.get().toInt() != 0
+                    val isBeingPushed: Boolean = bb.get().toInt() != 0
+                    val isDizzy: Boolean = bb.get().toInt() != 0
+
+                    // ==========================================================
+                    // 2. MOOD & BEHAVIOUR TRIGGERS
+                    // ==========================================================
+                    val frustrationPeaked: Boolean = bb.get().toInt() != 0
+
+                    // ==========================================================
+                    // 3. LEGACY HEURISTIC METRICS
+                    // (Keep these until the HeuristicDecider is fully deleted)
+                    // ==========================================================
+                    val dizzyBarYaw: Float = bb.float
+                    val dizzyBarPitch: Float = bb.float
+                    val dizzyBarRoll: Float = bb.float
+                    val smoothedTotalEnergy: Float = bb.float
+                    val frustrationLevel: Float = bb.float
+
+                    val teaseConfirmed: Boolean = bb.get().toInt() != 0
+                    val targetVanished: Boolean = bb.get().toInt() != 0
+                    val dizzyTriggered: Boolean = bb.get().toInt() != 0
+                    val dizzyFinished: Boolean = bb.get().toInt() != 0
+                    val readyForCompassLock: Boolean = bb.get().toInt() != 0
+                    val safelyLanded: Boolean = bb.get().toInt() != 0
+                    val isHandTeasing: Boolean = bb.get().toInt() != 0
+                    val isHandVanishing: Boolean = bb.get().toInt() != 0
+                    val hasExperiencedLift: Boolean = bb.get().toInt() != 0
+                    val isLowering: Boolean = bb.get().toInt() != 0
+                    val hasLanded: Boolean = bb.get().toInt() != 0
 
                     localSnapshot = localSnapshot.copy(events = EventState(
-                        hazardDetected = hazardDetected, teaseConfirmed = teaseConfirmed,
-                        targetVanished = targetVanished, dizzyTriggered = dizzyTriggered,
-                        dizzyFinished = dizzyFinished, readyForCompassLock = readyForCompassLock,
-                        safelyLanded = safelyLanded, frustrationPeaked = frustrationPeaked,
-                        dizzyBarYaw = dizzyBarYaw, dizzyBarPitch = dizzyBarPitch, dizzyBarRoll = dizzyBarRoll,
-                        smoothedTotalEnergy = smoothedTotalEnergy, frustrationLevel = frustrationLevel,
-                        isHandTeasing = isHandTeasing, isHandVanishing = isHandVanishing,
-                        isHandling = isHandling, hasExperiencedLift = hasExperiencedLift,
-                        isLowering = isLowering, hasLanded = hasLanded, isDizzy = isDizzy
+                        isHandling = isHandling,
+                        isFreeFalling = isFreeFalling,
+                        isUpright = isUpright,
+                        isUpsideDown = isUpsideDown,
+                        isTippedLeft = isTippedLeft,
+                        isTippedRight = isTippedRight,
+                        isNoseUp = isNoseUp,
+                        isNoseDown = isNoseDown,
+                        isAbsolutelyStill = isAbsolutelyStill,
+                        isStuck = isStuck,
+                        hazardDetected = hazardDetected,
+                        isBeingTeased = isBeingTeased,
+                        isBeingPushed = isBeingPushed,
+                        isDizzy = isDizzy,
+                        frustrationPeaked = frustrationPeaked,
+                        dizzyBarYaw = dizzyBarYaw,
+                        dizzyBarPitch = dizzyBarPitch,
+                        dizzyBarRoll = dizzyBarRoll,
+                        smoothedTotalEnergy = smoothedTotalEnergy,
+                        frustrationLevel = frustrationLevel,
+                        teaseConfirmed = teaseConfirmed,
+                        targetVanished = targetVanished,
+                        dizzyTriggered = dizzyTriggered,
+                        dizzyFinished = dizzyFinished,
+                        readyForCompassLock = readyForCompassLock,
+                        safelyLanded = safelyLanded,
+                        isHandTeasing = isHandTeasing,
+                        isHandVanishing = isHandVanishing,
+                        hasExperiencedLift = hasExperiencedLift,
+                        isLowering = isLowering,
+                        hasLanded = hasLanded
                     ))
+
+//                    val hazardDetected = bb.get().toInt() != 0
+//                    val teaseConfirmed = bb.get().toInt() != 0
+//                    val targetVanished = bb.get().toInt() != 0
+//                    val dizzyTriggered = bb.get().toInt() != 0
+//                    val dizzyFinished = bb.get().toInt() != 0
+//                    val readyForCompassLock = bb.get().toInt() != 0
+//                    val safelyLanded = bb.get().toInt() != 0
+//                    val frustrationPeaked = bb.get().toInt() != 0
+//
+//                    // Extract the 5 floats
+//                    val dizzyBarYaw = bb.float
+//                    val dizzyBarPitch = bb.float
+//                    val dizzyBarRoll = bb.float
+//                    val smoothedTotalEnergy = bb.float
+//                    val frustrationLevel = bb.float
+//
+//                    // Extract the final 7 booleans
+//                    val isHandTeasing = bb.get().toInt() != 0
+//                    val isHandVanishing = bb.get().toInt() != 0
+//                    val isHandling = bb.get().toInt() != 0
+//                    val hasExperiencedLift = bb.get().toInt() != 0
+//                    val isLowering = bb.get().toInt() != 0
+//                    val hasLanded = bb.get().toInt() != 0
+//                    val isDizzy = bb.get().toInt() != 0
+
+//                    localSnapshot = localSnapshot.copy(events = EventState(
+//                        hazardDetected = hazardDetected, teaseConfirmed = teaseConfirmed,
+//                        targetVanished = targetVanished, dizzyTriggered = dizzyTriggered,
+//                        dizzyFinished = dizzyFinished, readyForCompassLock = readyForCompassLock,
+//                        safelyLanded = safelyLanded, frustrationPeaked = frustrationPeaked,
+//                        dizzyBarYaw = dizzyBarYaw, dizzyBarPitch = dizzyBarPitch, dizzyBarRoll = dizzyBarRoll,
+//                        smoothedTotalEnergy = smoothedTotalEnergy, frustrationLevel = frustrationLevel,
+//                        isHandTeasing = isHandTeasing, isHandVanishing = isHandVanishing,
+//                        isHandling = isHandling, hasExperiencedLift = hasExperiencedLift,
+//                        isLowering = isLowering, hasLanded = hasLanded, isDizzy = isDizzy
+//                    ))
                 }
             }
         } catch (e: Exception) { /* Malformed payload */ }

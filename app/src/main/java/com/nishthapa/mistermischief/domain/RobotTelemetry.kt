@@ -62,28 +62,76 @@ data class NetworkLink(
 )
 
 data class EventState(
+//    val hazardDetected: Boolean = false,
+//    val teaseConfirmed: Boolean = false,
+//    val targetVanished: Boolean = false,
+//    val dizzyTriggered: Boolean = false,
+//    val dizzyFinished: Boolean = false,
+//    val readyForCompassLock: Boolean = false,
+//    val safelyLanded: Boolean = false,
+//    val frustrationPeaked: Boolean = false,
+//
+//    val dizzyBarYaw: Float = 0f,
+//    val dizzyBarPitch: Float = 0f,
+//    val dizzyBarRoll: Float = 0f,
+//    val smoothedTotalEnergy: Float = 0f,
+//    val frustrationLevel: Float = 0f,
+//
+//    val isHandTeasing: Boolean = false,
+//    val isHandVanishing: Boolean = false,
+//    val isHandling: Boolean = false,
+//    val hasExperiencedLift: Boolean = false,
+//    val isLowering: Boolean = false,
+//    val hasLanded: Boolean = false,
+//    val isDizzy: Boolean = false
+
+    // ==========================================================
+    // 1. THE AI PERCEPTION LATCHES (The Physical Truth)
+    // ==========================================================
+    val isHandling: Boolean = false,
+    val isFreeFalling: Boolean = false,
+
+    // --- The Complete Orientation Set ---
+    val isUpright: Boolean = true,          // Tracks on the floor
+    val isUpsideDown: Boolean = false,      // Completely flipped over (Resting on top)
+    val isTippedLeft: Boolean = false,      // Resting on left side
+    val isTippedRight: Boolean = false,     // Resting on right side
+    val isNoseUp: Boolean = false,          // Pitch > 70 deg (Stuck pointing at ceiling)
+    val isNoseDown: Boolean = false,        // Pitch < -70 deg (Faceplant / Pointing at floor)
+
+    val isAbsolutelyStill: Boolean = false,
+    val isStuck: Boolean = false,
     val hazardDetected: Boolean = false,
+    val isBeingTeased: Boolean = false,
+    val isBeingPushed: Boolean = false,
+    val isDizzy: Boolean = false,
+
+    // ==========================================================
+    // 2. MOOD & BEHAVIOUR TRIGGERS
+    // ==========================================================
+    val frustrationPeaked: Boolean = false,
+
+    // ==========================================================
+    // 3. LEGACY HEURISTIC METRICS
+    // (Keep these until the HeuristicDecider is fully deleted)
+    // ==========================================================
+    val dizzyBarYaw: Float = 0.0f,
+    val dizzyBarPitch: Float = 0.0f,
+    val dizzyBarRoll: Float = 0.0f,
+    val smoothedTotalEnergy: Float = 0.0f,
+    val frustrationLevel: Float = 0.0f,
+
     val teaseConfirmed: Boolean = false,
     val targetVanished: Boolean = false,
     val dizzyTriggered: Boolean = false,
     val dizzyFinished: Boolean = false,
     val readyForCompassLock: Boolean = false,
     val safelyLanded: Boolean = false,
-    val frustrationPeaked: Boolean = false,
-
-    val dizzyBarYaw: Float = 0f,
-    val dizzyBarPitch: Float = 0f,
-    val dizzyBarRoll: Float = 0f,
-    val smoothedTotalEnergy: Float = 0f,
-    val frustrationLevel: Float = 0f,
-
     val isHandTeasing: Boolean = false,
     val isHandVanishing: Boolean = false,
-    val isHandling: Boolean = false,
     val hasExperiencedLift: Boolean = false,
     val isLowering: Boolean = false,
-    val hasLanded: Boolean = false,
-    val isDizzy: Boolean = false
+    val hasLanded: Boolean = false
 )
 
 data class ControlDebug(
