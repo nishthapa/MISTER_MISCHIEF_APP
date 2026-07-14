@@ -37,7 +37,7 @@ data class SensorState(
     val hasBaro: Boolean = false,
     val pressurePa: Float = 0.0f,
     val altitudeCM: Float = 0.0f,
-    val altitudeDeltaCM: Float = 0.0f,
+    val pressureDeltaPa: Float = 0.0f,
     val temperatureC: Float = 0.0f,
     val batteryVoltageMV: UShort = 0u,
     val currentDrawMA: Short = 0
@@ -62,29 +62,6 @@ data class NetworkLink(
 )
 
 data class EventState(
-//    val hazardDetected: Boolean = false,
-//    val teaseConfirmed: Boolean = false,
-//    val targetVanished: Boolean = false,
-//    val dizzyTriggered: Boolean = false,
-//    val dizzyFinished: Boolean = false,
-//    val readyForCompassLock: Boolean = false,
-//    val safelyLanded: Boolean = false,
-//    val frustrationPeaked: Boolean = false,
-//
-//    val dizzyBarYaw: Float = 0f,
-//    val dizzyBarPitch: Float = 0f,
-//    val dizzyBarRoll: Float = 0f,
-//    val smoothedTotalEnergy: Float = 0f,
-//    val frustrationLevel: Float = 0f,
-//
-//    val isHandTeasing: Boolean = false,
-//    val isHandVanishing: Boolean = false,
-//    val isHandling: Boolean = false,
-//    val hasExperiencedLift: Boolean = false,
-//    val isLowering: Boolean = false,
-//    val hasLanded: Boolean = false,
-//    val isDizzy: Boolean = false
-
     // ==========================================================
     // 1. THE AI PERCEPTION LATCHES (The Physical Truth)
     // ==========================================================
@@ -100,6 +77,7 @@ data class EventState(
     val isNoseDown: Boolean = false,        // Pitch < -70 deg (Faceplant / Pointing at floor)
 
     val isAbsolutelyStill: Boolean = false,
+    val isImpactDetected: Boolean = false,
     val isStuck: Boolean = false,
     val hazardDetected: Boolean = false,
     val isBeingTeased: Boolean = false,
@@ -126,7 +104,6 @@ data class EventState(
     val dizzyTriggered: Boolean = false,
     val dizzyFinished: Boolean = false,
     val readyForCompassLock: Boolean = false,
-    val safelyLanded: Boolean = false,
     val isHandTeasing: Boolean = false,
     val isHandVanishing: Boolean = false,
     val hasExperiencedLift: Boolean = false,
@@ -142,9 +119,9 @@ data class ControlDebug(
 
 data class PerceptionMetrics(
     val distanceDelta: Float = 0f,
-    val totalRawEnergy: Float = 0f,
     val rawYawEnergy: Float = 0f,
     val rawPitchEnergy: Float = 0f,
     val rawRollEnergy: Float = 0f,
+    val totalRawEnergy: Float = 0f,
     val currentGForce: Float = 0f
 )

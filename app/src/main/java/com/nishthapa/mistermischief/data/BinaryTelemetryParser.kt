@@ -108,7 +108,7 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                 110 -> { // Sensor State (<fHh)
                     localSnapshot = localSnapshot.copy(sensors = SensorState(
                         distanceCM = bb.float, hasBaro = bb.get().toInt() != 0, pressurePa = bb.float,
-                        altitudeCM = bb.float, altitudeDeltaCM = bb.float, temperatureC = bb.float,
+                        altitudeCM = bb.float, pressureDeltaPa = bb.float, temperatureC = bb.float,
                         batteryVoltageMV = bb.short.toUShort(), currentDrawMA = bb.short
                     ))
                 }
@@ -138,8 +138,8 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                 }
                 136 -> { // Perception (<6f)
                     localSnapshot = localSnapshot.copy(perception = PerceptionMetrics(
-                        distanceDelta = bb.float, totalRawEnergy = bb.float, rawYawEnergy = bb.float,
-                        rawPitchEnergy = bb.float, rawRollEnergy = bb.float, currentGForce = bb.float
+                        distanceDelta = bb.float,  rawYawEnergy = bb.float, rawPitchEnergy = bb.float,
+                        rawRollEnergy = bb.float, totalRawEnergy = bb.float,currentGForce = bb.float
                     ))
                 }
                 135 -> {// Events (<8?5f7?)
@@ -159,6 +159,7 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                     val isNoseDown: Boolean = bb.get().toInt() != 0       // Pitch < -70 deg (Faceplant / Pointing at floor)
 
                     val isAbsolutelyStill: Boolean = bb.get().toInt() != 0
+                    val isImpactDetected: Boolean = bb.get().toInt() != 0
                     val isStuck: Boolean = bb.get().toInt() != 0
                     val hazardDetected: Boolean = bb.get().toInt() != 0
                     val isBeingTeased: Boolean = bb.get().toInt() != 0
@@ -185,7 +186,6 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                     val dizzyTriggered: Boolean = bb.get().toInt() != 0
                     val dizzyFinished: Boolean = bb.get().toInt() != 0
                     val readyForCompassLock: Boolean = bb.get().toInt() != 0
-                    val safelyLanded: Boolean = bb.get().toInt() != 0
                     val isHandTeasing: Boolean = bb.get().toInt() != 0
                     val isHandVanishing: Boolean = bb.get().toInt() != 0
                     val hasExperiencedLift: Boolean = bb.get().toInt() != 0
@@ -195,73 +195,41 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                     localSnapshot = localSnapshot.copy(events = EventState(
                         isHandling = isHandling,
                         isFreeFalling = isFreeFalling,
+
                         isUpright = isUpright,
                         isUpsideDown = isUpsideDown,
                         isTippedLeft = isTippedLeft,
                         isTippedRight = isTippedRight,
                         isNoseUp = isNoseUp,
                         isNoseDown = isNoseDown,
+
                         isAbsolutelyStill = isAbsolutelyStill,
+                        isImpactDetected = isImpactDetected,
                         isStuck = isStuck,
                         hazardDetected = hazardDetected,
                         isBeingTeased = isBeingTeased,
                         isBeingPushed = isBeingPushed,
                         isDizzy = isDizzy,
+
                         frustrationPeaked = frustrationPeaked,
+
                         dizzyBarYaw = dizzyBarYaw,
                         dizzyBarPitch = dizzyBarPitch,
                         dizzyBarRoll = dizzyBarRoll,
                         smoothedTotalEnergy = smoothedTotalEnergy,
                         frustrationLevel = frustrationLevel,
+
                         teaseConfirmed = teaseConfirmed,
                         targetVanished = targetVanished,
                         dizzyTriggered = dizzyTriggered,
                         dizzyFinished = dizzyFinished,
                         readyForCompassLock = readyForCompassLock,
-                        safelyLanded = safelyLanded,
                         isHandTeasing = isHandTeasing,
                         isHandVanishing = isHandVanishing,
                         hasExperiencedLift = hasExperiencedLift,
                         isLowering = isLowering,
                         hasLanded = hasLanded
                     ))
-
-//                    val hazardDetected = bb.get().toInt() != 0
-//                    val teaseConfirmed = bb.get().toInt() != 0
-//                    val targetVanished = bb.get().toInt() != 0
-//                    val dizzyTriggered = bb.get().toInt() != 0
-//                    val dizzyFinished = bb.get().toInt() != 0
-//                    val readyForCompassLock = bb.get().toInt() != 0
-//                    val safelyLanded = bb.get().toInt() != 0
-//                    val frustrationPeaked = bb.get().toInt() != 0
-//
-//                    // Extract the 5 floats
-//                    val dizzyBarYaw = bb.float
-//                    val dizzyBarPitch = bb.float
-//                    val dizzyBarRoll = bb.float
-//                    val smoothedTotalEnergy = bb.float
-//                    val frustrationLevel = bb.float
-//
-//                    // Extract the final 7 booleans
-//                    val isHandTeasing = bb.get().toInt() != 0
-//                    val isHandVanishing = bb.get().toInt() != 0
-//                    val isHandling = bb.get().toInt() != 0
-//                    val hasExperiencedLift = bb.get().toInt() != 0
-//                    val isLowering = bb.get().toInt() != 0
-//                    val hasLanded = bb.get().toInt() != 0
-//                    val isDizzy = bb.get().toInt() != 0
-
-//                    localSnapshot = localSnapshot.copy(events = EventState(
-//                        hazardDetected = hazardDetected, teaseConfirmed = teaseConfirmed,
-//                        targetVanished = targetVanished, dizzyTriggered = dizzyTriggered,
-//                        dizzyFinished = dizzyFinished, readyForCompassLock = readyForCompassLock,
-//                        safelyLanded = safelyLanded, frustrationPeaked = frustrationPeaked,
-//                        dizzyBarYaw = dizzyBarYaw, dizzyBarPitch = dizzyBarPitch, dizzyBarRoll = dizzyBarRoll,
-//                        smoothedTotalEnergy = smoothedTotalEnergy, frustrationLevel = frustrationLevel,
-//                        isHandTeasing = isHandTeasing, isHandVanishing = isHandVanishing,
-//                        isHandling = isHandling, hasExperiencedLift = hasExperiencedLift,
-//                        isLowering = isLowering, hasLanded = hasLanded, isDizzy = isDizzy
-//                    ))
                 }
             }
         } catch (e: Exception) { /* Malformed payload */ }
