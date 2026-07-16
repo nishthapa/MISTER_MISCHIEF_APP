@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.nishthapa.mistermischief.domain.RobotTelemetry
 import com.nishthapa.mistermischief.presentation.RemoteControlViewModel
+import com.nishthapa.mistermischief.presentation.components.RobotVisualizer
+import androidx.compose.runtime.saveable.rememberSaveable
 
 @Composable
 fun TelemetryScreen(viewModel: RemoteControlViewModel) {
@@ -187,11 +189,43 @@ fun TelemetryDataDisplay(category: String, telemetry: RobotTelemetry) {
             }
 
             "Physics" -> {
+                // Keep track of the Z-axis visual offset
+                var yawOffset by rememberSaveable { mutableFloatStateOf(0f) }
+
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // 3D Visualizer
+                    RobotVisualizer(
+                        pitchDeg = telemetry.physics.pitch,
+                        rollDeg = telemetry.physics.roll,
+                        yawDeg = telemetry.physics.yaw,
+                        yawOffset = yawOffset, // <--- Add this missing parameter
+                        sonarDistanceCm = telemetry.sensors.distanceCM,
+                        leftPwm = telemetry.actuators.leftMotorPWM.toInt(),
+                        rightPwm = telemetry.actuators.rightMotorPWM.toInt(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // 2. The Reset Z Axis Button (Aligned to the right)
+                    TextButton(
+                        onClick = { yawOffset = telemetry.physics.yaw },
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .offset(y = (-12).dp)
+                    ) {
+                        Text("Reset Z axis")
+                    }
+                }
+
+                // 3. Clear visual separation rule
+                HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
+
+                // 4. Precise Text Metrics underneath
                 DataRow("Yaw / Pitch / Roll", "${"%.1f".format(telemetry.physics.yaw)}° / ${"%.1f".format(telemetry.physics.pitch)}° / ${"%.1f".format(telemetry.physics.roll)}°")
                 DataRow("G-Force", "${"%.2f".format(telemetry.physics.gForce)} G")
+                DataRow("Accel (X / Y / Z)", "${"%.1f".format(telemetry.physics.accelX)} g / ${"%.1f".format(telemetry.physics.accelY)} g / ${"%.1f".format(telemetry.physics.accelZ)} g")
+                DataRow("Gyro (X / Y / Z)", "${"%.1f".format(telemetry.physics.gyroX)} °/s / ${"%.1f".format(telemetry.physics.gyroY)} °/s / ${"%.1f".format(telemetry.physics.gyroZ)} °/s")
                 DataRow("Has Compass", telemetry.physics.hasCompass.toString().uppercase())
                 DataRow("Compass Heading", "${"%.1f".format(telemetry.physics.compassHeading)}°")
-                //DataRow("Motor PWM (L/R)", "${telemetry.physics.leftMotorPWM} / ${telemetry.physics.rightMotorPWM}")
             }
             "Sensors" -> {
                 DataRow("Sonar Distance", if (telemetry.sensors.distanceCM < 0) "OOR" else "${"%.1f".format(telemetry.sensors.distanceCM)} cm")

@@ -23,7 +23,10 @@ data class CognitiveState(
 
 data class PhysicsState(
     val yaw: Float = 0f, val pitch: Float = 0f, val roll: Float = 0f,
-    val gForce: Float = 0f, val hasCompass: Boolean = false, val compassHeading: Float = 0f // <-- ADDED hasCompass
+    val gForce: Float = 0f,
+    val accelX: Float = 0f, val accelY: Float = 0f, val accelZ: Float = 0f,
+    val gyroX: Float = 0f, val gyroY: Float = 0f, val gyroZ: Float = 0f,
+    val hasCompass: Boolean = false, val compassHeading: Float = 0f // <-- ADDED hasCompass
 )
 
 data class ActuatorState(

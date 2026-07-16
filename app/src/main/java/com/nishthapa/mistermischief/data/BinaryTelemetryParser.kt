@@ -94,7 +94,10 @@ class BinaryTelemetryParser(private val telemetryState: MutableStateFlow<RobotTe
                 }
                 101 -> { // Physics State (<ffff?fhh)
                     localSnapshot = localSnapshot.copy(physics = PhysicsState(
-                        yaw = bb.float, pitch = bb.float, roll = bb.float, gForce = bb.float,
+                        yaw = bb.float, pitch = bb.float, roll = bb.float,
+                        gForce = bb.float,
+                        accelX = bb.float, accelY = bb.float, accelZ = bb.float,
+                        gyroX = bb.float, gyroY = bb.float, gyroZ = bb.float,
                         hasCompass = bb.get().toInt() != 0, compassHeading = bb.float // <-- ADDED THIS LINE
                         //leftMotorPWM = bb.short, rightMotorPWM = bb.short
                     ))
